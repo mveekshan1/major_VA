@@ -1,0 +1,8 @@
+speechrecognition
+pyaudio
+scikit-learn
+pandas
+joblib
+nltk
+psutil
+pyttsx3
