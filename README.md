@@ -17,19 +17,6 @@ The project is designed with a **modular and extensible architecture**, making i
 - Modular architecture (UI, NLP, control, skills)  
 - Offline-capable core functionality  
 
----
-
-## 📁 Project Structure
-
-ai-voice-agent/
-│
-├── core/ # NLP processing, intent model, command engine
-├── skills/ # System automation modules (file control, etc.)
-├── ui/ # Tkinter-based frontend
-├── data/ # Training dataset for intent classification
-├── requirements.txt # Python dependencies
-├── main.py # Application entry point
-└── README.md
 
 
 ---
