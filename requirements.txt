@@ -6,3 +6,5 @@ joblib
 nltk
 psutil
 pyttsx3
+pandas
+PySide6
