@@ -1,4 +1,4 @@
-# 🧠 An NLP-Based Intelligent Agent for System Automation
+# An NLP-Based Intelligent Agent for System Automation
 
 This repository contains the implementation of an NLP-driven intelligent voice-based agent that enables users to automate system-level tasks using natural language through voice or text commands.  
 The system integrates Speech Recognition, Natural Language Processing (NLP), and Machine Learning–based intent classification to interpret commands and perform actions such as file manipulation and basic system automation.
