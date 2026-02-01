@@ -1,7 +1,6 @@
 speechrecognition
 pyaudio
 scikit-learn
-pandas
 joblib
 nltk
 psutil

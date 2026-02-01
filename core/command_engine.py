@@ -5,69 +5,43 @@ from skills import file_control, application_control
 model = joblib.load("core/intent_model.pkl")
 
 def normalize_name(text: str) -> str:
+    """Extracts a filename or folder name from the command."""
     text = text.lower()
-
-    replacements = {
-        " dot ": ".",
-        " underscore ": "_",
-        " dash ": "-",
-        " space ": "",
-        " slash ": "/"
-    }
-
+    # Replace spoken punctuation with characters
+    replacements = {" dot ": ".", " underscore ": "_", " dash ": "-", " space ": ""}
     for k, v in replacements.items():
         text = text.replace(k, v)
-
     
+    # Remove action-related keywords to isolate the name
     text = re.sub(
-        r"\b(named|called|as|file|folder|directory|a|the|please|can you|could you)",
+        r"\b(named|called|as|file|folder|directory|a|the|please|can you|could you|create|delete|make|remove)\b",
         "",
         text
     )
-
+    # Clean up whitespace and return the last significant word, assumed to be the name
     text = re.sub(r"\s+", " ", text).strip()
-
     parts = text.split()
-    if not parts:
-        return ""
-
-    return parts[-1]
-
-def extract_app_name(text: str) -> str:
-    """
-    Extracts the application name from the command text.
-    This is a simple implementation that looks for keywords.
-    """
-    text = text.lower()
-    keywords = ["open", "close", "switch to", "run", "launch", "terminate", "kill", "focus on", "start", "exit", "to"]
-    
-    # Remove keywords to isolate the app name
-    for keyword in keywords:
-        text = text.replace(keyword, "")
-    
-    # A more advanced version could use NLP to find the object of the verb.
-    # For now, we'll take the remaining text, assuming it's the app name.
-    
-    # Remove common filler words
-    text = re.sub(r"\b(application|program|app|the|a|an|please|can you|could you)\b", "", text)
-    
-    return text.strip()
-
+    return parts[-1] if parts else ""
 
 def process_command(text: str) -> str:
-  
+    """
+    Processes a command by predicting its intent and routing to the correct skill.
+    """
+    # Use the model to predict the intent with a confidence score
     scores = model.decision_function([text])
-    confidence = abs(scores).max()
+    confidence = scores.max() 
 
-    if confidence < 0.3:
-        return "I am not sure what you mean. Please rephrase."
+    # If confidence is too low, ask for clarification
+    if confidence < 0.4: # Increased threshold for better reliability
+        return "I'm not quite sure what you mean. Could you please rephrase that?"
 
     intent = model.predict([text])[0]
     
+    # --- File Operations ---
     if intent in {"CREATE_FILE", "DELETE_FILE", "CREATE_FOLDER", "DELETE_FOLDER"}:
         name = normalize_name(text)
         if not name:
-            return "Please specify a file or folder name."
+            return "Please specify a name for the file or folder."
         
         if intent == "CREATE_FILE":
             return file_control.create_file(name)
@@ -81,23 +55,22 @@ def process_command(text: str) -> str:
     elif intent == "LIST_FILES":
         return file_control.list_items()
 
-    elif intent in {"OPEN_APPLICATION", "CLOSE_APPLICATION", "SWITCH_APPLICATION"}:
-        app_name = extract_app_name(text)
-        if not app_name:
-            return f"Please specify an application name."
+    # --- Application Control ---
+    elif intent == "OPEN_APPLICATION":
+        return application_control.open_app(text)
         
-        if intent == "OPEN_APPLICATION":
-            return application_control.open_application(app_name)
-        elif intent == "CLOSE_APPLICATION":
-            return application_control.close_application(app_name)
-        elif intent == "SWITCH_APPLICATION":
-            return application_control.switch_application(app_name)
+    elif intent == "CLOSE_APPLICATION":
+        return application_control.close_app(text)
+
+    elif intent == "SWITCH_APPLICATION":
+        return application_control.switch_to_app(text)
 
     elif intent == "LIST_INSTALLED_APPLICATIONS":
-        return application_control.list_installed_applications()
+        return application_control.list_installed_apps()
     
     elif intent == "LIST_RUNNING_APPLICATIONS":
-        return application_control.list_running_applications()
+        return application_control.list_running_apps()
 
+    # --- Fallback ---
     else:
-        return "Intent not recognized."
+        return "I'm sorry, I don't know how to do that yet."
