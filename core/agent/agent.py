@@ -1,42 +1,47 @@
 import os
 import json
+import re
 import google.generativeai as genai
-from core.agent.memory import Memory
 
-class Agent:
-    def __init__(self):
-        api_key = os.getenv('GEMINI_API_KEY')
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY environment variable not set")
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
-        self.memory = Memory()
+from core.agent.memory import memory
 
-    def process_command(self, user_input: str) -> str:
-        # Get context from memory
-        last_app = self.memory.get_last_app()
-        history = self.memory.get_recent_history()
 
-        # Build prompt for LLM with multilingual support
-        prompt = f"""
-You are a conversational AI agent that controls system applications. Understand user input in English or Indian languages like Telugu/Hindi. Based on the user's input, decide which action to take.
+# ---------------- GEMINI SETUP ----------------
 
-Available actions:
-- open_app: Open an application
-- close_app: Close an application
-- list_installed: List installed applications
-- list_running: List running applications
-- switch_app: Switch to a running application
-- search: Search in browser
-- none: No action needed
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY environment variable not set")
+
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+
+# ---------------- AGENT (DECISION ONLY) ----------------
+
+def decide_action(user_text: str) -> dict:
+    """
+    Uses Gemini to decide the action to take.
+    Returns a structured dict, does NOT execute anything.
+    """
+
+    last_app = memory.get_last_app()
+
+    prompt = f"""
+You are a system automation AI agent.
+Understand natural language in English or Indian languages like Telugu and Hindi.
 
 Context:
-- Last app used: {last_app or 'None'}
-- Recent conversation: {json.dumps(history, indent=2)}
+- Last application used: {last_app or "None"}
 
-User input: "{user_input}"
+User input:
+"{user_text}"
 
-Respond ONLY with valid JSON in this format:
+Decide the action and respond ONLY with valid JSON.
+
+Valid actions:
+open_app, close_app, list_installed, list_running, switch_app, search, none
+
+JSON format:
 {{
   "action": "open_app | close_app | list_installed | list_running | switch_app | search | none",
   "app": "string or null",
@@ -45,55 +50,22 @@ Respond ONLY with valid JSON in this format:
 }}
 
 Rules:
-- If app is not specified, use last_app if available.
-- Confidence is a float between 0.0 and 1.0 based on how sure you are.
-- If confidence < 0.5, set action to "none".
+- If app is not mentioned, infer it from context if possible.
+- Confidence must be between 0.0 and 1.0.
+- Do NOT include any explanation text.
 """
 
-        try:
-            response = self.model.generate_content(prompt)
-            result = json.loads(response.text.strip())
-            action = result.get('action')
-            app = result.get('app')
-            query = result.get('query')
-            confidence = result.get('confidence', 0.0)
+    response = model.generate_content(prompt)
+    raw_text = response.text.strip()
 
-            if confidence < 0.5:
-                return "I'm not confident about that action. Can you clarify?"
+    # -------- SAFE JSON EXTRACTION --------
+    match = re.search(r"\{.*\}", raw_text, re.S)
+    if not match:
+        return {"action": "none", "confidence": 0.0}
 
-            # Execute action
-            if action == 'open_app':
-                from skills.application_control import open_app
-                if not app and last_app:
-                    app = last_app
-                result_str = open_app(f"open {app}")
-                self.memory.update_last_app(app)
-            elif action == 'close_app':
-                from skills.application_control import close_app
-                if not app and last_app:
-                    app = last_app
-                result_str = close_app(f"close {app}")
-            elif action == 'list_installed':
-                from skills.application_control import list_installed_apps
-                result_str = list_installed_apps()
-            elif action == 'list_running':
-                from skills.application_control import list_running_apps
-                result_str = list_running_apps()
-            elif action == 'switch_app':
-                from skills.application_control import switch_to_app
-                if not app and last_app:
-                    app = last_app
-                result_str = switch_to_app(f"switch to {app}")
-                self.memory.update_last_app(app)
-            elif action == 'search':
-                from skills.browser_control import search_in_browser
-                result_str = search_in_browser(query or user_input)
-            else:
-                result_str = "Action not recognized."
+    try:
+        decision = json.loads(match.group())
+    except json.JSONDecodeError:
+        return {"action": "none", "confidence": 0.0}
 
-            # Update memory
-            self.memory.add_to_history(user_input, result_str)
-            return result_str
-
-        except Exception as e:
-            return f"Error processing command: {e}"
+    return decision

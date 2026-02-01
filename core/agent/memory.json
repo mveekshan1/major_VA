@@ -1,0 +1,9 @@
+{
+    "last_app": "notepad",
+    "conversation_history": [
+        {
+            "user": "open notepad",
+            "agent": "Opened notepad"
+        }
+    ]
+}
