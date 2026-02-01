@@ -17,14 +17,14 @@ class Agent:
         last_app = self.memory.get_last_app()
         history = self.memory.get_recent_history()
 
-        # Build prompt for LLM
+        # Build prompt for LLM with multilingual support
         prompt = f"""
-You are a conversational AI agent that controls system applications. Based on the user's input, decide which action to take.
+You are a conversational AI agent that controls system applications. Understand user input in English or Indian languages like Telugu/Hindi. Based on the user's input, decide which action to take.
 
 Available actions:
 - open_app: Open an application
 - close_app: Close an application
-- list_apps: List installed applications
+- list_installed: List installed applications
 - list_running: List running applications
 - switch_app: Switch to a running application
 - search: Search in browser
@@ -38,7 +38,7 @@ User input: "{user_input}"
 
 Respond ONLY with valid JSON in this format:
 {{
-  "action": "open_app | close_app | list_apps | list_running | switch_app | search | none",
+  "action": "open_app | close_app | list_installed | list_running | switch_app | search | none",
   "app": "string or null",
   "query": "string or null",
   "confidence": 0.0
@@ -73,7 +73,7 @@ Rules:
                 if not app and last_app:
                     app = last_app
                 result_str = close_app(f"close {app}")
-            elif action == 'list_apps':
+            elif action == 'list_installed':
                 from skills.application_control import list_installed_apps
                 result_str = list_installed_apps()
             elif action == 'list_running':
