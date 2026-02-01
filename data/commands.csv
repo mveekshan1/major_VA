@@ -29,7 +29,6 @@ add new file,CREATE_FILE
 create blank file,CREATE_FILE
 create empty file,CREATE_FILE
 start a new file,CREATE_FILE
-
 create folder,CREATE_FOLDER
 create a folder,CREATE_FOLDER
 make a folder,CREATE_FOLDER
@@ -60,7 +59,6 @@ start a new folder,CREATE_FOLDER
 make a new directory,CREATE_FOLDER
 create project folder,CREATE_FOLDER
 create working folder,CREATE_FOLDER
-
 delete file,DELETE_FILE
 remove file,DELETE_FILE
 erase file,DELETE_FILE
@@ -81,7 +79,6 @@ delete file here,DELETE_FILE
 remove file from folder,DELETE_FILE
 delete selected file,DELETE_FILE
 delete unwanted file,DELETE_FILE
-
 delete folder,DELETE_FOLDER
 remove folder,DELETE_FOLDER
 erase folder,DELETE_FOLDER
@@ -102,7 +99,6 @@ delete folder here,DELETE_FOLDER
 remove folder from path,DELETE_FOLDER
 delete selected folder,DELETE_FOLDER
 delete unwanted folder,DELETE_FOLDER
-
 list files,LIST_FILES
 show files,LIST_FILES
 display files,LIST_FILES
@@ -123,4 +119,53 @@ view files,LIST_FILES
 show folder contents,LIST_FILES
 list directory,LIST_FILES
 list all items,LIST_FILES
-
+open application,OPEN_APPLICATION
+start program,OPEN_APPLICATION
+launch app,OPEN_APPLICATION
+run chrome,OPEN_APPLICATION
+open notepad,OPEN_APPLICATION
+start vs code,OPEN_APPLICATION
+can you open calculator,OPEN_APPLICATION
+please launch spotify,OPEN_APPLICATION
+open the terminal,OPEN_APPLICATION
+run photoshop,OPEN_APPLICATION
+close application,CLOSE_APPLICATION
+exit program,CLOSE_APPLICATION
+kill app,CLOSE_APPLICATION
+terminate chrome,CLOSE_APPLICATION
+close notepad,CLOSE_APPLICATION
+exit vs code,CLOSE_APPLICATION
+can you close calculator,CLOSE_APPLICATION
+please terminate spotify,CLOSE_APPLICATION
+close the terminal,CLOSE_APPLICATION
+kill photoshop,CLOSE_APPLICATION
+list installed applications,LIST_INSTALLED_APPLICATIONS
+show all installed apps,LIST_INSTALLED_APPLICATIONS
+what programs are installed,LIST_INSTALLED_APPLICATIONS
+display all my applications,LIST_INSTALLED_APPLICATIONS
+list my programs,LIST_INSTALLED_APPLICATIONS
+can you list installed software,LIST_INSTALLED_APPLICATIONS
+show me every app,LIST_INSTALLED_APPLICATIONS
+what is installed on this computer,LIST_INSTALLED_APPLICATIONS
+list all installed programs,LIST_INSTALLED_APPLICATIONS
+give me a list of apps,LIST_INSTALLED_APPLICATIONS
+list running applications,LIST_RUNNING_APPLICATIONS
+show running processes,LIST_RUNNING_APPLICATIONS
+what apps are currently open,LIST_RUNNING_APPLICATIONS
+display all running tasks,LIST_RUNNING_APPLICATIONS
+list active applications,LIST_RUNNING_APPLICATIONS
+show me the open programs,LIST_RUNNING_APPLICATIONS
+what is running right now,LIST_RUNNING_APPLICATIONS
+current processes,LIST_RUNNING_APPLICATIONS
+list all open windows,LIST_RUNNING_APPLICATIONS
+show active tasks,LIST_RUNNING_APPLICATIONS
+switch application,SWITCH_APPLICATION
+change focus to another app,SWITCH_APPLICATION
+move to chrome,SWITCH_APPLICATION
+switch to notepad,SWITCH_APPLICATION
+focus on vs code,SWITCH_APPLICATION
+can you switch to the browser,SWITCH_APPLICATION
+change to spotify,SWITCH_APPLICATION
+activate terminal window,SWITCH_APPLICATION
+bring photoshop to front,SWITCH_APPLICATION
+go to calculator,SWITCH_APPLICATION

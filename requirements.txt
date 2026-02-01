@@ -8,3 +8,4 @@ psutil
 pyttsx3
 pandas
 PySide6
+pygetwindow
