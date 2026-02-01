@@ -9,3 +9,4 @@ pandas
 PySide6
 pygetwindow
 google-generativeai
+python-dotenv
