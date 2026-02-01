@@ -1,29 +1,24 @@
 import os
 import json
 import re
-import google.generativeai as genai
+
+from dotenv import load_dotenv
+from google import genai
 
 from core.agent.memory import memory
 
+# ---------------- LOAD ENV ----------------
+load_dotenv()
 
-# ---------------- GEMINI SETUP ----------------
-
+# ---------------- GEMINI CLIENT ----------------
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     raise RuntimeError("GEMINI_API_KEY environment variable not set")
 
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-1.5-flash")
-
+client = genai.Client(api_key=api_key)
 
 # ---------------- AGENT (DECISION ONLY) ----------------
-
 def decide_action(user_text: str) -> dict:
-    """
-    Uses Gemini to decide the action to take.
-    Returns a structured dict, does NOT execute anything.
-    """
-
     last_app = memory.get_last_app()
 
     prompt = f"""
@@ -36,7 +31,7 @@ Context:
 User input:
 "{user_text}"
 
-Decide the action and respond ONLY with valid JSON.
+Respond ONLY with valid JSON.
 
 Valid actions:
 open_app, close_app, list_installed, list_running, switch_app, search, none
@@ -48,24 +43,20 @@ JSON format:
   "query": "string or null",
   "confidence": 0.0
 }}
-
-Rules:
-- If app is not mentioned, infer it from context if possible.
-- Confidence must be between 0.0 and 1.0.
-- Do NOT include any explanation text.
 """
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt
+    )
+
     raw_text = response.text.strip()
 
-    # -------- SAFE JSON EXTRACTION --------
     match = re.search(r"\{.*\}", raw_text, re.S)
     if not match:
         return {"action": "none", "confidence": 0.0}
 
     try:
-        decision = json.loads(match.group())
+        return json.loads(match.group())
     except json.JSONDecodeError:
         return {"action": "none", "confidence": 0.0}
-
-    return decision

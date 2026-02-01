@@ -36,3 +36,6 @@ class Memory:
 
     def get_recent_history(self, n=5):
         return self.context["conversation_history"][-n:]
+
+# Instantiate the memory object
+memory = Memory()
